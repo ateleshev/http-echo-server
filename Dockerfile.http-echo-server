@@ -1,0 +1,22 @@
+FROM golang:1.21 AS builder
+
+WORKDIR /app
+COPY go.mod .
+COPY main.go .
+RUN go mod download
+RUN go build -o http-echo-server
+
+# Using debian:bookworm as the base image for the runtime stage
+FROM debian:bookworm
+
+# Install ca-certificates, necessary for making HTTPS connections
+RUN apt-get update && apt-get install -y ca-certificates && rm -rf /var/lib/apt/lists/*
+
+# Copy the binary from the builder stage
+COPY --from=builder /app/http-echo-server /
+
+# Expose the ports the service listens on
+EXPOSE 8080 9090
+
+# Command to run the service
+CMD ["/http-echo-server"]
