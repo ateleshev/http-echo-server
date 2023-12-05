@@ -1,0 +1,37 @@
+namespace: http-echo-server
+
+http-echo-server:
+  defines: runnable
+  metadata:
+    name: http-echo-server
+    description: >-
+      A Go-based HTTP echo server that listens on two ports and echoes back
+      request details.
+    icon: https://emojiapi.dev/api/v1/robot.svg
+  containers:
+    http-echo-server:
+      image: env-2137.registry.local/http-echo-server:main-504e5a3
+      build: .
+      dockerfile: Dockerfile.http-echo-server
+  services:
+    http-port:
+      description: HTTP port for the echo server
+      container: http-echo-server
+      port: 8080
+      host-port: 8080
+      publish: true
+      protocol: tcp
+    secondary-http-port:
+      description: Secondary HTTP port for the echo server
+      container: http-echo-server
+      port: 9090
+      host-port: 9090
+      publish: true
+      protocol: tcp
+  connections: {}
+  variables: {}
+
+stack:
+  defines: group
+  members:
+    - http-echo-server/http-echo-server
